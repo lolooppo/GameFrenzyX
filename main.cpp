@@ -187,7 +187,7 @@ private:
 
 public:
 
-    VolleyballPlayGround(const std::string& name, const bool& available, const double& SandGroundPrice, const double& RubberGroundPrice) :Volleyball
+    VolleyballPlayGround(const std::string& name, const bool& available, const double& SandGroundPrice, const double& RubberGroundPrice) :
         Reservable(name, "Volleyball", available), SandGroundPrice(SandGroundPrice), RubberGroundPrice(RubberGroundPrice) {
     }
 
@@ -255,7 +255,7 @@ private:
 public:
 
     SwimmingPool(const std::string& name, const bool& available, const double& ColdWaterPrice, const double& WarmWaterPrice) :
-        Reservable(name, "Swimming pool", available), ColdWaterPrice(ColdWaterPrice), WarmWaterPrice(WarmWaterPrice) {
+        Reservable(name, "Swimming", available), ColdWaterPrice(ColdWaterPrice), WarmWaterPrice(WarmWaterPrice) {
     }
 
     double getColdWaterPrice () const {
@@ -897,7 +897,75 @@ public:
                 reservablesDirectory[name] = new FootballPlayGround(name, available, AmPrice, PmPrice);
 
             }else if (category == "Volleyball") {
-                //std::string 
+                std::string SandGroundPriceString;
+                std::string RubberGroundPriceString;
+                double SandGroundPrice;
+                double RubberGroundPrice;
+
+                std::getline(ss, SandGroundPriceString, ',');
+                std::getline(ss, RubberGroundPriceString, ',');
+
+                SandGroundPrice   = std::stod(SandGroundPriceString);
+                RubberGroundPrice = std::stod(RubberGroundPriceString);
+
+                reservablesDirectory[name] = new VolleyballPlayGround(name, available, SandGroundPrice, RubberGroundPrice);
+
+            }else if (category == "Tennis") {
+                std::string SinglePlayerMatchPriceString;
+                std::string MultiPlayerMatchPriceString ;
+                double SinglePlayerMatchPrice;
+                double MultiPlayerMatchPrice ;
+
+                std::getline(ss, SinglePlayerMatchPriceString, ',');
+                std::getline(ss, MultiPlayerMatchPriceString, ',' );
+
+                SinglePlayerMatchPrice = std::stod(SinglePlayerMatchPriceString);
+                MultiPlayerMatchPrice  = std::stod(MultiPlayerMatchPriceString );
+
+                reservablesDirectory[name] = new TennisPlayGround(name, available, SinglePlayerMatchPrice, MultiPlayerMatchPrice);
+
+            }else if (category == "Swimming") {
+                std::string ColdWaterPriceString;
+                std::string WarmWaterPriceString;
+                double ColdWaterPrice;
+                double WarmWaterPrice;
+
+                std::getline(ss, ColdWaterPriceString, ',');
+                std::getline(ss, WarmWaterPriceString, ',');
+
+                ColdWaterPrice = std::stod(ColdWaterPriceString);
+                WarmWaterPrice = std::stod(WarmWaterPriceString);
+
+                reservablesDirectory[name] = new SwimmingPool(name, available, ColdWaterPrice, WarmWaterPrice);
+
+            }else if (category == "Ping bong") {
+                std::string SinglePlayerMatchPriceString;
+                std::string MultiPlayerMatchPriceString ;
+                double SinglePlayerMatchPrice;
+                double MultiPlayerMatchPrice ;
+
+                std::getline(ss, SinglePlayerMatchPriceString, ',');
+                std::getline(ss, MultiPlayerMatchPriceString, ',' );
+
+                SinglePlayerMatchPrice = std::stod(SinglePlayerMatchPriceString);
+                MultiPlayerMatchPrice  = std::stod(MultiPlayerMatchPriceString );
+
+                reservablesDirectory[name] = new PingbongTable(name, available, SinglePlayerMatchPrice, MultiPlayerMatchPrice);
+
+            }else if (category == "Billiards") {
+                std::string NormalGamePriceString;
+                std::string AmericanGamePriceStirng;
+                double NormalGamePrice;
+                double AmericanGamePrice;
+
+                std::getline(ss, NormalGamePriceString, ','  );
+                std::getline(ss, AmericanGamePriceStirng, ',');
+
+                NormalGamePrice   = std::stod(NormalGamePriceString  );
+                AmericanGamePrice = std::stod(AmericanGamePriceStirng);
+
+                reservablesDirectory[name] = new BilliardsTable(name, available, NormalGamePrice, AmericanGamePrice);
+
             }
 
             reservableNames.insert(name);
@@ -928,8 +996,58 @@ public:
                 std::string PmPriceString = oss2.str();
 
                 oss<<AmPriceString<<","<<PmPriceString;
-            }
 
+            }else if (category == "Volleyball") {
+                std::ostringstream oss1, oss2;
+                oss1 << std::fixed << std::setprecision(2) << static_cast<VolleyballPlayGround*>(pair.second) -> getSandGroundPrice  ();
+                oss2 << std::fixed << std::setprecision(2) << static_cast<VolleyballPlayGround*>(pair.second) -> getRubberGroundPrice();
+
+                std::string SandGroundPriceString   = oss1.str();
+                std::string RubberGroundPriceString = oss2.str();
+
+                oss<<SandGroundPriceString<<","<<RubberGroundPriceString;
+
+            }else if (category == "Tennis") {
+                std::ostringstream oss1, oss2;
+                oss1 << std::fixed << std::setprecision(2) << static_cast<TennisPlayGround*>(pair.second) -> getSinglePlayerMatchPrice();
+                oss2 << std::fixed << std::setprecision(2) << static_cast<TennisPlayGround*>(pair.second) -> getMultiPlayerMatchPrice ();
+
+                std::string SinglePlayerMatchPriceString   = oss1.str();
+                std::string MultiPlayerMatchPriceString    = oss2.str();
+
+                oss<<SinglePlayerMatchPriceString<<","<<MultiPlayerMatchPriceString;
+
+            }else if (category == "Swimming") {
+                std::ostringstream oss1, oss2;
+                oss1 << std::fixed << std::setprecision(2) << static_cast<SwimmingPool*>(pair.second) -> getColdWaterPrice();
+                oss2 << std::fixed << std::setprecision(2) << static_cast<SwimmingPool*>(pair.second) -> getWarmWaterPrice();
+
+                std::string ColdWaterPriceString    = oss1.str();
+                std::string WarmWaterPriceString    = oss2.str();
+
+                oss<<ColdWaterPriceString<<","<<WarmWaterPriceString;
+
+            }else if (category == "Ping bong") {
+                std::ostringstream oss1, oss2;
+                oss1 << std::fixed << std::setprecision(2) << static_cast<PingbongTable*>(pair.second) -> getSinglePlayerMatchPrice();
+                oss2 << std::fixed << std::setprecision(2) << static_cast<PingbongTable*>(pair.second) -> getMultiPlayerMatchPrice ();
+
+                std::string SinglePlayerMatchPriceString   = oss1.str();
+                std::string MultiPlayerMatchPriceString    = oss2.str();
+
+                oss<<SinglePlayerMatchPriceString<<","<<MultiPlayerMatchPriceString;
+
+            }else if (category == "Billiards") {
+                std::ostringstream oss1, oss2;
+                oss1 << std::fixed << std::setprecision(2) << static_cast<BilliardsTable*>(pair.second) -> getNormalGamePrice  ();
+                oss2 << std::fixed << std::setprecision(2) << static_cast<BilliardsTable*>(pair.second) -> getAmericanGamePrice();
+
+                std::string NormalGamePriceString      = oss1.str();
+                std::string AmericanGamePriceString    = oss2.str();
+
+                oss<<NormalGamePriceString<<","<<AmericanGamePriceString;
+
+            }
 
             file_handler<<oss.str()<<"\n";
         }
@@ -1294,9 +1412,20 @@ public:
 
 
     void test () {
+
         for (auto& pair : reservablesDirectory) {
             pair.second -> showReservableInfo();
         }
+
+        /*
+        reservablesDirectory["f-16"] = new FootballPlayGround("f-16", 1, 125.50, 200.00);
+        reservablesDirectory["v-3"]  = new VolleyballPlayGround("v-3", 0, 130, 140.5);
+        reservablesDirectory["t-14"] = new TennisPlayGround("t-14", 0, 140, 100.4);
+        reservablesDirectory["s-102"]= new SwimmingPool("s-102", 1, 175.6, 200);
+        reservablesDirectory["p-201"]= new PingbongTable("p-201", 1, 20, 35);
+        reservablesDirectory["b-200"]= new BilliardsTable("b-200", 1, 100, 150.5);
+        */
+
         databaseManagerInstance->update_reservables(reservablesDirectory);
     }
 
