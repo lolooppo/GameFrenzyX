@@ -365,16 +365,20 @@ protected:
 
     int from;
     int to;
-    User* user;
+    std::string userName;
     Reservable* reservable;
 
 public:
 
-    Reservation(const int& from, const int& to, User* user, Reservable* reservable) :
-        from(from), to(to), user(user), reservable(reservable) {
+    Reservation(const int& from, const int& to, const std::string& userName) :
+        from(from), to(to), userName(userName) {
     }
 
     virtual double getTotalPrice () = 0;
+
+    void setReservable (Reservable* reservable) {
+        this->reservable = reservable;
+    }
 
     std::pair<int, int> getReservedPeriod () const {
         return {from, to};
@@ -387,13 +391,12 @@ public:
     virtual void ShowReservationInfo () const {
         std::cerr   <<  "-----------------------------------------------------------------------\n";
         std::cerr   <<  "|  Reserved From: "  <<   from << ", To: "  <<  to  <<  "\n";
-        std::cerr   <<  "|  Reserved By: " <<  user->getName() <<  "\n";
-        std::cerr   <<  "|  Reserved Item Category: "  <<  reservable->getCategory() <<  "\n";
+        std::cerr   <<  "|  Reserved By: " <<  userName <<  "\n";
         std::cerr   <<  "|  Reserved Item Name: "  <<  reservable->getName() <<  "\n";
     }
 
     std::string ShowReserverInfo () const{
-        return user->getName();
+        return userName;
     }
 
 };
@@ -411,8 +414,8 @@ private:
 
 public:
 
-    FootballReservation(const int& from, const int& to, User* user, FootballPlayGround* playGround, const bool& isMorningReservation) :
-        Reservation(from, to, user, playGround), isMorningReservation(isMorningReservation) {
+    FootballReservation(const int& from, const int& to, const std::string& userName, const bool& isMorningReservation) :
+        Reservation(from, to, userName), isMorningReservation(isMorningReservation) {
     }
 
     double getTotalPrice () override {
@@ -445,8 +448,8 @@ private:
 
 public:
 
-    VolleyballReservation(const int& from, const int& to, User* user, Reservable* reservable, const bool& isSandGround) :
-        Reservation(from, to, user, reservable), isSandGround(isSandGround) {
+    VolleyballReservation(const int& from, const int& to, const std::string& userName, const bool& isSandGround) :
+        Reservation(from, to, userName), isSandGround(isSandGround) {
     }
 
     virtual double getTotalPrice () override {
@@ -477,8 +480,8 @@ private:
 
 public:
 
-    TennisReservation (const int& from, const int& to, User* user, Reservable* reservable, const bool& isSingleMatch) :
-        Reservation(from, to, user, reservable), isSingleMatch(isSingleMatch) {
+    TennisReservation (const int& from, const int& to, const std::string& userName, const bool& isSingleMatch) :
+        Reservation(from, to, userName), isSingleMatch(isSingleMatch) {
     }
 
     virtual double getTotalPrice () override {
@@ -509,8 +512,8 @@ private:
 
 public:
 
-    SwimmingpoolReservation(const int& from, const int& to, User* user, Reservable* reservable, const bool& isColdWaterReservation) :
-        Reservation(from, to, user, reservable), isColdWaterReservation(isColdWaterReservation) {
+    SwimmingpoolReservation(const int& from, const int& to, const std::string& userName, const bool& isColdWaterReservation) :
+        Reservation(from, to, userName), isColdWaterReservation(isColdWaterReservation) {
     }
 
     virtual double getTotalPrice () override {
@@ -538,8 +541,8 @@ private:
 
 public:
 
-    PingbongReservation(const int& from, const int& to, User* user, Reservable* reservable, const bool& isSingleMatch) :
-        Reservation(from, to, user, reservable), isSingleMatch(isSingleMatch) {
+    PingbongReservation(const int& from, const int& to, const std::string& userName, const bool& isSingleMatch) :
+        Reservation(from, to, userName), isSingleMatch(isSingleMatch) {
     }
 
     virtual double getTotalPrice () override {
@@ -566,8 +569,8 @@ private:
 
 public:
 
-    BilliardsReservation(const int& from, const int& to, User* user, Reservable* reservable, const bool& isNormalGame) :
-        Reservation(from, to, user, reservable), isNormalGame(isNormalGame) {
+    BilliardsReservation(const int& from, const int& to, const std::string& userName, const bool& isNormalGame) :
+        Reservation(from, to, userName), isNormalGame(isNormalGame) {
     }
 
     virtual double getTotalPrice () override {
@@ -778,11 +781,10 @@ class DatabaseManager {
 private:
 
     std::string users_file_path;
-    std::string reservations_file_path;
     std::string reservables_file_path;
 
-    DatabaseManager(const std::string& users_file_path, const std::string& reservations_file_path, const std::string& reservables_file_path) :
-        users_file_path(users_file_path), reservations_file_path(reservations_file_path), reservables_file_path(reservables_file_path){
+    DatabaseManager(const std::string& users_file_path, const std::string& reservables_file_path) :
+        users_file_path(users_file_path), reservables_file_path(reservables_file_path){
     }
 
 
@@ -790,9 +792,9 @@ private:
 
 public:
 
-    static DatabaseManager* getInstance (const std::string& users_file_path, const std::string& reservables_file_path,const std::string& reservations_file_path) {
+    static DatabaseManager* getInstance (const std::string& users_file_path, const std::string& reservables_file_path) {
         if(databaseManagerInstance == nullptr)
-            databaseManagerInstance = new DatabaseManager (users_file_path, reservations_file_path, reservables_file_path);
+            databaseManagerInstance = new DatabaseManager (users_file_path, reservables_file_path);
 
         return databaseManagerInstance;
     }
@@ -1059,11 +1061,6 @@ public:
 
 
 
-    void load_reservations () {}
-
-    void update_reservations () {}
-
-
 
 
     static void freeInstance () {
@@ -1307,8 +1304,8 @@ public:
      *
      * @param users_file_path Path to the user database file.
      */
-    SystemManager(const std::string& users_file_path, const std::string& reservables_file_path, const std::string& reservations_file_path) {
-        databaseManagerInstance = DatabaseManager::getInstance(users_file_path, reservables_file_path, reservations_file_path);
+    SystemManager(const std::string& users_file_path, const std::string& reservables_file_path) {
+        databaseManagerInstance = DatabaseManager::getInstance(users_file_path, reservables_file_path);
         databaseManagerInstance->load_users(usernames, userDirectory);
         databaseManagerInstance->load_reservables(reservablenames, reservablesDirectory);
 
@@ -1436,7 +1433,7 @@ public:
 
 int main() {
 
-    SystemManager sys("data_base\\users.txt", "data_base\\reservables.txt", "blabla");
-    sys.test();
+    SystemManager sys("data_base\\users.txt", "data_base\\reservables.txt");
+    //sys.test();
 
 }
