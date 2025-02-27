@@ -9,9 +9,15 @@
 #include <string>
 #include <iomanip>
 
-// Constants for admin credentials
+
+//Administrator Credintals
 const std::string name     = "lolooppo";
 const std::string password = "lolooppo@2004";
+
+
+
+
+
 
 /**
  * Represents a user with a username and password.
@@ -25,92 +31,86 @@ private:
     std::string password;
 
 public:
-    // Constructor to initialize user with name and password
-    User (const std::string& name, const std::string& password) :
+    User(const std::string& name, const std::string& password) :
         name(name), password(password) {
     }
 
-    // Setter for username
-    void setName (const std::string& name) {
+    void setName(const std::string& name) {
         this->name = name;
     }
 
-    // Getter for username
-    std::string getName () const {
+    std::string getName() const {
         return name;
     }
 
-    // Setter for password
-    void setPassword (const std::string& password) {
+    void setPassword(const std::string& password) {
         this->password = password;
     }
 
-    // Getter for password
-    std::string getPassword () const {
+    std::string getPassword() const {
         return password;
     }
 };
 
+
+
+
+
+
+
 /**
- * Represents a reservable item (e.g., a sports facility).
- * This class provides functionality for managing the availability
- * and reservation periods of the item.
+ * Represents a reservable item with a name, category, availability status,
+ * and available periods. This class provides functionality for managing
+ * reservations and checking availability.
  */
 class Reservable {
 private:
     std::string name;
     std::string category;
     bool available;
-    int availablePeriods[13]; // Array to track availability for each period (1-12)
+    int availablePeriods[13];
 
 public:
-    // Constructor to initialize reservable item
-    Reservable (std::string name, std::string category, bool available) :
+    Reservable(std::string name, std::string category, bool available) :
         name(name), category(category), available(available) {
-            memset(availablePeriods, 0, sizeof(availablePeriods)); // Initialize all periods as available
+            memset(availablePeriods, 0, sizeof(availablePeriods));
     }
 
-    // Getter for name
-    std::string getName () const {
+    virtual ~Reservable(){}
+
+    std::string getName() const {
         return name;
     }
 
-    // Getter for category
-    std::string getCategory () const {
+    std::string getCategory() const {
         return category;
     }
 
-    // Check if the reservable is available
-    bool isReservableAvailable () const {
+    bool isReservableAvailable() const {
         return available;
     }
 
-    // Change the availability status of the reservable
-    void changeReservableAvailability (const bool& new_status) {
+    void changeReservableAvailability(const bool& new_status) {
         available = new_status;
     }
 
-    // Reserve a period (mark as unavailable)
-    void reservePeriod (const int& from, const int& to) {
+    void reservePeriod(const int& from, const int& to) {
         for(int i=from; i<=to; i++)
             availablePeriods[i]++;
     }
 
-    // Free a period (mark as available)
-    void freePeriod (const int& from, const int& to) {
+    void freePeriod(const int& from, const int& to) {
         for(int i=from; i<=to; i++){
             availablePeriods[i]--;
-            availablePeriods[i] = std::max(availablePeriods[i], 0); // Ensure no negative values
+            availablePeriods[i] = std::max(availablePeriods[i], 0);
         }
     }
 
-    // Free all periods (mark all as available)
-    void freeWholePeriods () {
+    void freeWholePeriods() {
         memset(availablePeriods, 0, sizeof(availablePeriods));
     }
 
-    // Check if a specific period is available
-    bool isPeriodAvailable (const int& from, const int& to) const {
+    bool isPeriodAvailable(const int& from, const int& to) const {
         for(int i = from; i<=to; i++)
             if(availablePeriods[i] != 0)
                 return false;
@@ -118,549 +118,581 @@ public:
         return true;
     }
 
-    // Show available periods
-    void showAvailablePeriods () const {
+    void showAvailablePeriods() const {
         for(int i=1; i<=12; i++){
             if(availablePeriods[i] == 0){
-                std::cerr   <<  i <<  ", ";
+                std::cerr << i << ", ";
             }
         }
-        std::cerr   <<  "\n";
+        std::cerr << "\n";
     }
 
-    // Virtual function to display reservable information
-    virtual void showReservableInfo () const {
-        std::cerr   <<  "----------------------------------------------------------------------------------\n";
-        std::cerr   <<  "| Name             : "    <<  name       <<  "\n";
-        std::cerr   <<  "| Category         : "    <<  category   <<  "\n";
-        std::cerr   <<  "| Status           : ";
-        available ? std::cerr   <<  "Available\n" : std::cerr <<  "Under Maintenance\n";
-        std::cerr   <<  "| Available Periods: " ;
+    virtual void showReservableInfo() const {
+        std::cerr << "----------------------------------------------------------------------------------\n";
+        std::cerr << "| Name             : " << name << "\n";
+        std::cerr << "| Category         : " << category << "\n";
+        std::cerr << "| Status           : ";
+        available ? std::cerr << "Available\n" : std::cerr << "Under Maintenance\n";
+        std::cerr << "| Available Periods: ";
         for(int i=1; i<=12; i++){
             if(availablePeriods[i] == 0)
-                std::cerr   <<  i <<  ", ";
+                std::cerr << i << ", ";
         }
-        std::cerr   <<  "\n";
+        std::cerr << "\n";
     }
 
-    // Destructor
-    ~Reservable () {}
 };
 
+
+
+
+
+
 /**
- * Represents a football playground, a type of reservable item.
- * This class extends Reservable and adds specific attributes like morning and night prices.
+ * Represents a football playground, which is a type of reservable item.
+ * This class extends the Reservable class and adds specific attributes
+ * for football playgrounds, such as morning and night prices.
  */
 class FootballPlayGround : public Reservable {
 private:
-    double AmPrice; // Morning price
-    double PmPrice; // Night price
+    double AmPrice;
+    double PmPrice;
 
 public:
-    // Constructor to initialize football playground
     FootballPlayGround(std::string name, bool available, double AmPrice, double PmPrice) :
         Reservable(name, "Football", available), AmPrice(AmPrice), PmPrice(PmPrice) {
     }
 
-    // Getter for morning price
-    double getAmPrice () const {
+
+    double getAmPrice() const {
         return AmPrice;
     }
 
-    // Getter for night price
-    double getPmPrice () const {
+    double getPmPrice() const {
         return PmPrice;
     }
 
-    // Override to display football playground information
-    void showReservableInfo () const {
+    void showReservableInfo() const {
         Reservable::showReservableInfo();
-        std::cerr   <<  "| Morning Price    : " <<  AmPrice <<  "\n";
-        std::cerr   <<  "| Night   Price    : " <<  PmPrice <<  "\n";
-        std::cerr   <<  "----------------------------------------------------------------------------------\n";
+        std::cerr << "| Morning Price    : " << AmPrice << "\n";
+        std::cerr << "| Night   Price    : " << PmPrice << "\n";
+        std::cerr << "----------------------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
+
 /**
- * Represents a volleyball playground, a type of reservable item.
- * This class extends Reservable and adds specific attributes like sand and rubber ground prices.
+ * Represents a volleyball playground, which is a type of reservable item.
+ * This class extends the Reservable class and adds specific attributes
+ * for volleyball playgrounds, such as sand and rubber ground prices.
  */
 class VolleyballPlayGround : public Reservable {
 private:
-    double SandGroundPrice; // Price for sand ground
-    double RubberGroundPrice; // Price for rubber ground
+    double SandGroundPrice;
+    double RubberGroundPrice;
 
 public:
-    // Constructor to initialize volleyball playground
     VolleyballPlayGround(const std::string& name, const bool& available, const double& SandGroundPrice, const double& RubberGroundPrice) :
         Reservable(name, "Volleyball", available), SandGroundPrice(SandGroundPrice), RubberGroundPrice(RubberGroundPrice) {
     }
 
-    // Getter for sand ground price
-    double getSandGroundPrice () const {
+    double getSandGroundPrice() const {
         return SandGroundPrice;
     }
 
-    // Getter for rubber ground price
-    double getRubberGroundPrice () const {
+    double getRubberGroundPrice() const {
         return RubberGroundPrice;
     }
 
-    // Override to display volleyball playground information
-    void showReservableInfo () const {
+    void showReservableInfo() const {
         Reservable::showReservableInfo();
-        std::cerr   <<  "| Sand Ground Price    : "   <<  SandGroundPrice   <<  "\n";
-        std::cerr   <<  "| Rubber Ground Price    : " <<  RubberGroundPrice <<  "\n";
-        std::cerr   <<  "----------------------------------------------------------------------------------\n";
+        std::cerr << "| Sand Ground Price    : " << SandGroundPrice << "\n";
+        std::cerr << "| Rubber Ground Price    : " << RubberGroundPrice << "\n";
+        std::cerr << "----------------------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
+
+
+
 /**
- * Represents a tennis playground, a type of reservable item.
- * This class extends Reservable and adds specific attributes like single and multiplayer match prices.
+ * Represents a tennis playground, which is a type of reservable item.
+ * This class extends the Reservable class and adds specific attributes
+ * for tennis playgrounds, such as single and multiplayer match prices.
  */
 class TennisPlayGround : public Reservable {
 private:
-    double SinglePlayerMatchPrice; // Price for single player match
-    double MultiPlayerMatchPrice; // Price for multiplayer match
+    double SinglePlayerMatchPrice;
+    double MultiPlayerMatchPrice;
 
 public:
-    // Constructor to initialize tennis playground
     TennisPlayGround(const std::string& name, const bool& available, const double& SinglePlayerMatchPrice, const double& MultiPlayerMatchPrice) :
         Reservable(name, "Tennis", available), SinglePlayerMatchPrice(SinglePlayerMatchPrice), MultiPlayerMatchPrice(MultiPlayerMatchPrice) {
     }
 
-    // Getter for single player match price
-    double getSinglePlayerMatchPrice () const {
+
+    double getSinglePlayerMatchPrice() const {
         return SinglePlayerMatchPrice;
     }
 
-    // Getter for multiplayer match price
-    double getMultiPlayerMatchPrice () const {
+    double getMultiPlayerMatchPrice() const {
         return MultiPlayerMatchPrice;
     }
 
-    // Override to display tennis playground information
-    void showReservableInfo () const {
+    void showReservableInfo() const {
         Reservable::showReservableInfo();
-        std::cerr   <<  "| Singles Match Price    : "   <<  SinglePlayerMatchPrice   <<  "\n";
-        std::cerr   <<  "| Doubles Match Price    : " <<  MultiPlayerMatchPrice <<  "\n";
-        std::cerr   <<  "----------------------------------------------------------------------------------\n";
+        std::cerr << "| Singles Match Price    : " << SinglePlayerMatchPrice << "\n";
+        std::cerr << "| Doubles Match Price    : " << MultiPlayerMatchPrice << "\n";
+        std::cerr << "----------------------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
+
 /**
- * Represents a swimming pool, a type of reservable item.
- * This class extends Reservable and adds specific attributes like cold and warm water prices.
+ * Represents a swimming pool, which is a type of reservable item.
+ * This class extends the Reservable class and adds specific attributes
+ * for swimming pools, such as cold and warm water prices.
  */
 class SwimmingPool : public Reservable {
 private:
-    double ColdWaterPrice; // Price for cold water
-    double WarmWaterPrice; // Price for warm water
+    double ColdWaterPrice;
+    double WarmWaterPrice;
 
 public:
-    // Constructor to initialize swimming pool
     SwimmingPool(const std::string& name, const bool& available, const double& ColdWaterPrice, const double& WarmWaterPrice) :
         Reservable(name, "Swimming", available), ColdWaterPrice(ColdWaterPrice), WarmWaterPrice(WarmWaterPrice) {
     }
 
-    // Getter for cold water price
-    double getColdWaterPrice () const {
+
+    double getColdWaterPrice() const {
         return ColdWaterPrice;
     }
 
-    // Getter for warm water price
-    double getWarmWaterPrice () const {
+    double getWarmWaterPrice() const {
         return WarmWaterPrice;
     }
 
-    // Override to display swimming pool information
-    void showReservableInfo () const {
+    void showReservableInfo() const {
         Reservable::showReservableInfo();
-        std::cerr   <<  "| Cold Water Pool: "   <<  ColdWaterPrice   <<  "\n";
-        std::cerr   <<  "| Warm Water Pool: " <<  WarmWaterPrice <<  "\n";
-        std::cerr   <<  "----------------------------------------------------------------------------------\n";
+        std::cerr << "| Cold Water Pool: " << ColdWaterPrice << "\n";
+        std::cerr << "| Warm Water Pool: " << WarmWaterPrice << "\n";
+        std::cerr << "----------------------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
+
+
 /**
- * Represents a ping pong table, a type of reservable item.
- * This class extends Reservable and adds specific attributes like single and multiplayer match prices.
+ * Represents a ping-pong table, which is a type of reservable item.
+ * This class extends the Reservable class and adds specific attributes
+ * for ping-pong tables, such as single and multiplayer match prices.
  */
 class PingbongTable : public Reservable {
 private:
-    double SinglePlayerMatchPrice; // Price for single player match
-    double MultiPlayerMatchPrice; // Price for multiplayer match
+    double SinglePlayerMatchPrice;
+    double MultiPlayerMatchPrice;
 
 public:
-    // Constructor to initialize ping pong table
     PingbongTable(const std::string& name, const bool& available, const double& SinglePlayerMatchPrice, const double& MultiPlayerMatchPrice) :
         Reservable(name, "Ping", available), SinglePlayerMatchPrice(SinglePlayerMatchPrice), MultiPlayerMatchPrice(MultiPlayerMatchPrice) {
     }
 
-    // Getter for single player match price
-    double getSinglePlayerMatchPrice () const {
+
+    double getSinglePlayerMatchPrice() const {
         return SinglePlayerMatchPrice;
     }
 
-    // Getter for multiplayer match price
-    double getMultiPlayerMatchPrice () const {
+    double getMultiPlayerMatchPrice() const {
         return MultiPlayerMatchPrice;
     }
 
-    // Override to display ping pong table information
-    void showReservableInfo () const {
+    void showReservableInfo() const {
         Reservable::showReservableInfo();
-        std::cerr   <<  "| Singles Match Price: "   <<  SinglePlayerMatchPrice   <<  "\n";
-        std::cerr   <<  "| Doubles Match Price: " <<  MultiPlayerMatchPrice <<  "\n";
-        std::cerr   <<  "----------------------------------------------------------------------------------\n";
+        std::cerr << "| Singles Match Price: " << SinglePlayerMatchPrice << "\n";
+        std::cerr << "| Doubles Match Price: " << MultiPlayerMatchPrice << "\n";
+        std::cerr << "----------------------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
+
+
 /**
- * Represents a billiards table, a type of reservable item.
- * This class extends Reservable and adds specific attributes like normal and American game prices.
+ * Represents a billiards table, which is a type of reservable item.
+ * This class extends the Reservable class and adds specific attributes
+ * for billiards tables, such as normal and American game prices.
  */
 class BilliardsTable : public Reservable {
 private:
-    double NormalGamePrice; // Price for normal game
-    double AmericanGamePrice; // Price for American game
+    double NormalGamePrice;
+    double AmericanGamePrice;
 
 public:
-    // Constructor to initialize billiards table
     BilliardsTable(const std::string& name, const bool& available, const double& NormalGamePrice, const double& AmericanGamePrice) :
        Reservable(name, "Billiards", available), NormalGamePrice(NormalGamePrice), AmericanGamePrice(AmericanGamePrice) {
     }
 
-    // Getter for normal game price
-    double getNormalGamePrice () const {
+
+    double getNormalGamePrice() const {
         return NormalGamePrice;
     }
 
-    // Getter for American game price
-    double getAmericanGamePrice () const {
+    double getAmericanGamePrice() const {
         return AmericanGamePrice;
     }
 
-    // Override to display billiards table information
-    void showReservableInfo () const {
+    void showReservableInfo() const {
         Reservable::showReservableInfo();
-        std::cerr   <<  "| Normal Match Price: "   <<  NormalGamePrice   <<  "\n";
-        std::cerr   <<  "| American Match Price: " <<  AmericanGamePrice <<  "\n";
-        std::cerr   <<  "----------------------------------------------------------------------------------\n";
+        std::cerr << "| Normal Match Price: " << NormalGamePrice << "\n";
+        std::cerr << "| American Match Price: " << AmericanGamePrice << "\n";
+        std::cerr << "----------------------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
+
+
 /**
  * Represents a reservation made by a user for a specific reservable item.
- * This class provides functionality for managing reservations, including calculating the total price.
+ * This class provides functionality for managing reservations, including
+ * calculating the total price and displaying reservation information.
  */
 class Reservation {
 protected:
-    int from; // Start period of reservation
-    int to; // End period of reservation
-    std::string userName; // Name of the user making the reservation
-    Reservable* reservable; // Pointer to the reservable item
+    int from;
+    int to;
+    std::string userName;
+    Reservable* reservable;
 
 public:
-    // Constructor to initialize reservation
     Reservation(const int& from, const int& to, const std::string& userName) :
         from(from), to(to), userName(userName) {
     }
 
-    // Pure virtual function to calculate total price (to be implemented by derived classes)
-    virtual double getTotalPrice () = 0;
+    virtual ~Reservation(){}
 
-    // Setter for reservable item
-    void setReservable (Reservable* reservable) {
+    virtual double getTotalPrice() = 0;
+
+    void setReservable(Reservable* reservable) {
         this->reservable = reservable;
     }
 
-    // Getter for reservable item
-    const Reservable* getReservable () const{
+    const Reservable* getReservable() const {
         return reservable;
     }
 
-    // Getter for username
-    std::string getUserName () const {
+    std::string getUserName() const {
         return userName;
     }
 
-    // Getter for reserved period
-    std::pair<int, int> getReservedPeriod () const {
+    std::pair<int, int> getReservedPeriod() const {
         return {from, to};
     }
 
-    // Pure virtual function to get reservation status (to be implemented by derived classes)
     virtual bool getStatus() = 0;
 
-    // Calculate total time reserved
-    int totalTimeReserved () {
+    int totalTimeReserved() {
         return to - from;
     }
 
-    // Display reservation information
-    virtual void ShowReservationInfo () {
-        std::cerr   <<  "-----------------------------------------------------------------------\n";
-        std::cerr   <<  "|  Reserved From: "  <<   from << ", To: "  <<  to  <<  "\n";
-        std::cerr   <<  "|  Reserved By: " <<  userName <<  "\n";
-        std::cerr   <<  "|  Reserved Item Name: "  <<  reservable->getName() <<  "\n";
-        std::cerr   <<  "|  Total Price:    "   <<  getTotalPrice() <<  "\n";
+    virtual void ShowReservationInfo() {
+        std::cerr << "-----------------------------------------------------------------------\n";
+        std::cerr << "|  Reserved From: " << from << ", To: " << to << "\n";
+        std::cerr << "|  Reserved By: " << userName << "\n";
+        std::cerr << "|  Reserved Item Name: " << reservable->getName() << "\n";
+        std::cerr << "|  Total Price:    " << getTotalPrice() << "\n";
     }
 
-    // Get reserver info
-    std::string ShowReserverInfo () const{
+    std::string ShowReserverInfo() const {
         return userName;
     }
 };
 
+
+
+
+
+
 /**
- * Represents a football reservation, a type of reservation.
- * This class extends Reservation and adds specific attributes like morning or night reservation.
+ * Represents a reservation for a football playground.
+ * This class extends the Reservation class and adds specific attributes
+ * for football reservations, such as morning or night reservation.
  */
 class FootballReservation : public Reservation {
 private:
-    bool isMorningReservation; // True if reservation is for morning, false for night
+    bool isMorningReservation;
 
 public:
-    // Constructor to initialize football reservation
     FootballReservation(const int& from, const int& to, const std::string& userName, const bool& isMorningReservation) :
         Reservation(from, to, userName), isMorningReservation(isMorningReservation) {
     }
 
-    // Override to calculate total price based on morning or night reservation
-    double getTotalPrice () override {
+    double getTotalPrice() override {
         double total_price = isMorningReservation ? (totalTimeReserved() * static_cast<FootballPlayGround*>(reservable)->getAmPrice()) : (totalTimeReserved() * static_cast<FootballPlayGround*>(reservable)->getPmPrice());
         return total_price;
     }
 
-    // Override to get reservation status
-    bool getStatus () override {
+    bool getStatus() override {
         return isMorningReservation;
     }
 
-    // Override to display football reservation information
-    virtual void ShowReservationInfo () {
+    virtual void ShowReservationInfo() {
         Reservation::ShowReservationInfo();
-        std::cerr   <<  "|  Reservation Slot: " ;
-        isMorningReservation ? std::cerr    <<  "Morning" : std::cerr    <<  "Night";
-        std::cerr   <<  "\n";
-        std::cerr   <<  "-----------------------------------------------------------------------\n";
+        std::cerr << "|  Reservation Slot: ";
+        isMorningReservation ? std::cerr << "Morning" : std::cerr << "Night";
+        std::cerr << "\n";
+        std::cerr << "-----------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
 /**
- * Represents a volleyball reservation, a type of reservation.
- * This class extends Reservation and adds specific attributes like sand or rubber ground reservation.
+ * Represents a reservation for a volleyball playground.
+ * This class extends the Reservation class and adds specific attributes
+ * for volleyball reservations, such as sand or rubber ground reservation.
  */
 class VolleyballReservation : public Reservation {
 private:
-    bool isSandGround; // True if reservation is for sand ground, false for rubber ground
+    bool isSandGround;
 
 public:
-    // Constructor to initialize volleyball reservation
     VolleyballReservation(const int& from, const int& to, const std::string& userName, const bool& isSandGround) :
         Reservation(from, to, userName), isSandGround(isSandGround) {
     }
 
-    // Override to calculate total price based on sand or rubber ground reservation
-    virtual double getTotalPrice () override {
+    virtual double getTotalPrice() override {
         double total_price = isSandGround ? (totalTimeReserved() * static_cast<VolleyballPlayGround*>(reservable)->getSandGroundPrice()) : (totalTimeReserved() * static_cast<VolleyballPlayGround*>(reservable)->getRubberGroundPrice());
         return total_price;
     }
 
-    // Override to get reservation status
-    bool getStatus () override{
+    bool getStatus() override {
         return isSandGround;
     }
 
-    // Override to display volleyball reservation information
-    virtual void ShowReservationInfo () {
+    virtual void ShowReservationInfo() {
         Reservation::ShowReservationInfo();
-        std::cerr   <<  "|  Playground Type: " ;
-        isSandGround ? std::cerr    <<  "Sand" : std::cerr    <<  "Rubber";
-        std::cerr   <<  "\n";
-        std::cerr   <<  "-----------------------------------------------------------------------\n";
+        std::cerr << "|  Playground Type: ";
+        isSandGround ? std::cerr << "Sand" : std::cerr << "Rubber";
+        std::cerr << "\n";
+        std::cerr << "-----------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
 /**
- * Represents a tennis reservation, a type of reservation.
- * This class extends Reservation and adds specific attributes like single or multiplayer match reservation.
+ * Represents a reservation for a tennis playground.
+ * This class extends the Reservation class and adds specific attributes
+ * for tennis reservations, such as single or multiplayer match reservation.
  */
 class TennisReservation : public Reservation {
 private:
-    bool isSingleMatch; // True if reservation is for single match, false for multiplayer match
+    bool isSingleMatch;
 
 public:
-    // Constructor to initialize tennis reservation
-    TennisReservation (const int& from, const int& to, const std::string& userName, const bool& isSingleMatch) :
+    TennisReservation(const int& from, const int& to, const std::string& userName, const bool& isSingleMatch) :
         Reservation(from, to, userName), isSingleMatch(isSingleMatch) {
     }
 
-    // Override to calculate total price based on single or multiplayer match reservation
-    virtual double getTotalPrice () override {
+    virtual double getTotalPrice() override {
         double total_price = isSingleMatch ? (totalTimeReserved() * static_cast<TennisPlayGround*>(reservable)->getSinglePlayerMatchPrice()) : (totalTimeReserved() * static_cast<TennisPlayGround*>(reservable)->getMultiPlayerMatchPrice());
         return total_price;
     }
 
-    // Override to get reservation status
-    bool getStatus () override{
+    bool getStatus() override {
         return isSingleMatch;
     }
 
-    // Override to display tennis reservation information
-    virtual void ShowReservationInfo () {
+    virtual void ShowReservationInfo() {
         Reservation::ShowReservationInfo();
-        std::cerr   <<  "|  Game Type: " ;
-        isSingleMatch ? std::cerr    <<  "Singles" : std::cerr    <<  "Doubles";
-        std::cerr   <<  "\n";
-        std::cerr   <<  "-----------------------------------------------------------------------\n";
+        std::cerr << "|  Game Type: ";
+        isSingleMatch ? std::cerr << "Singles" : std::cerr << "Doubles";
+        std::cerr << "\n";
+        std::cerr << "-----------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
+
 /**
- * Represents a swimming pool reservation, a type of reservation.
- * This class extends Reservation and adds specific attributes like cold or warm water reservation.
+ * Represents a reservation for a swimming pool.
+ * This class extends the Reservation class and adds specific attributes
+ * for swimming pool reservations, such as cold or warm water reservation.
  */
 class SwimmingpoolReservation : public Reservation {
 private:
-    bool isColdWaterReservation; // True if reservation is for cold water, false for warm water
+    bool isColdWaterReservation;
 
 public:
-    // Constructor to initialize swimming pool reservation
     SwimmingpoolReservation(const int& from, const int& to, const std::string& userName, const bool& isColdWaterReservation) :
         Reservation(from, to, userName), isColdWaterReservation(isColdWaterReservation) {
     }
 
-    // Override to calculate total price based on cold or warm water reservation
-    virtual double getTotalPrice () override {
+    virtual double getTotalPrice() override {
         double total_price = isColdWaterReservation ? (totalTimeReserved() * static_cast<SwimmingPool*>(reservable)->getColdWaterPrice()) : (totalTimeReserved() * static_cast<SwimmingPool*>(reservable)->getWarmWaterPrice());
         return total_price;
     }
 
-    // Override to get reservation status
-    bool getStatus () override{
+    bool getStatus() override {
         return isColdWaterReservation;
     }
 
-    // Override to display swimming pool reservation information
-    virtual void ShowReservationInfo () {
+    virtual void ShowReservationInfo() {
         Reservation::ShowReservationInfo();
-        std::cerr   <<  "|  Pool water Condition: " ;
-        isColdWaterReservation ? std::cerr    <<  "Cold" : std::cerr    <<  "Warm";
-        std::cerr   <<  "\n";
-        std::cerr   <<  "-----------------------------------------------------------------------\n";
+        std::cerr << "|  Pool water Condition: ";
+        isColdWaterReservation ? std::cerr << "Cold" : std::cerr << "Warm";
+        std::cerr << "\n";
+        std::cerr << "-----------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
+
 /**
- * Represents a ping pong reservation, a type of reservation.
- * This class extends Reservation and adds specific attributes like single or multiplayer match reservation.
+ * Represents a reservation for a ping-pong table.
+ * This class extends the Reservation class and adds specific attributes
+ * for ping-pong reservations, such as single or multiplayer match reservation.
  */
 class PingbongReservation : public Reservation {
 private:
-    bool isSingleMatch; // True if reservation is for single match, false for multiplayer match
+    bool isSingleMatch;
 
 public:
-    // Constructor to initialize ping pong reservation
     PingbongReservation(const int& from, const int& to, const std::string& userName, const bool& isSingleMatch) :
         Reservation(from, to, userName), isSingleMatch(isSingleMatch) {
     }
 
-    // Override to calculate total price based on single or multiplayer match reservation
-    virtual double getTotalPrice () override {
+    virtual double getTotalPrice() override {
         double total_price = isSingleMatch ? (totalTimeReserved() * static_cast<PingbongTable*>(reservable)->getSinglePlayerMatchPrice()) : (totalTimeReserved() * static_cast<PingbongTable*>(reservable)->getMultiPlayerMatchPrice());
         return total_price;
     }
 
-    // Override to get reservation status
-    bool getStatus () override {
+    bool getStatus() override {
         return isSingleMatch;
     }
 
-    // Override to display ping pong reservation information
-    virtual void ShowReservationInfo () {
+    virtual void ShowReservationInfo() {
         Reservation::ShowReservationInfo();
-        std::cerr   <<  "|  Game Type: " ;
-        isSingleMatch ? std::cerr    <<  "Singles" : std::cerr    <<  "Doubles";
-        std::cerr   <<  "\n";
-        std::cerr   <<  "-----------------------------------------------------------------------\n";
+        std::cerr << "|  Game Type: ";
+        isSingleMatch ? std::cerr << "Singles" : std::cerr << "Doubles";
+        std::cerr << "\n";
+        std::cerr << "-----------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
+
 /**
- * Represents a billiards reservation, a type of reservation.
- * This class extends Reservation and adds specific attributes like normal or American game reservation.
+ * Represents a reservation for a billiards table.
+ * This class extends the Reservation class and adds specific attributes
+ * for billiards reservations, such as normal or American game reservation.
  */
 class BilliardsReservation : public Reservation {
 private:
-    bool isNormalGame; // True if reservation is for normal game, false for American game
+    bool isNormalGame;
 
 public:
-    // Constructor to initialize billiards reservation
     BilliardsReservation(const int& from, const int& to, const std::string& userName, const bool& isNormalGame) :
         Reservation(from, to, userName), isNormalGame(isNormalGame) {
     }
 
-    // Override to calculate total price based on normal or American game reservation
-    virtual double getTotalPrice () override {
+    virtual double getTotalPrice() override {
         double total_price = isNormalGame ? (totalTimeReserved() * static_cast<BilliardsTable*>(reservable)->getNormalGamePrice()) : (totalTimeReserved() * static_cast<BilliardsTable*>(reservable)->getAmericanGamePrice());
         return total_price;
     }
 
-    // Override to get reservation status
-    bool getStatus () override {
+    bool getStatus() override {
         return isNormalGame;
     }
 
-    // Override to display billiards reservation information
-    virtual void ShowReservationInfo () {
+    virtual void ShowReservationInfo() {
         Reservation::ShowReservationInfo();
-        std::cerr   <<  "|  Game Type: " ;
-        isNormalGame ? std::cerr    <<  "Normal" : std::cerr    <<  "American";
-        std::cerr   <<  "\n";
-        std::cerr   <<  "-----------------------------------------------------------------------\n";
+        std::cerr << "|  Game Type: ";
+        isNormalGame ? std::cerr << "Normal" : std::cerr << "American";
+        std::cerr << "\n";
+        std::cerr << "-----------------------------------------------------------------------\n";
     }
 };
+
+
+
+
+
 
 /**
  * Represents an itinerary, which is a collection of reservations made by a user.
- * This class provides functionality for managing and displaying the itinerary.
+ * This class provides functionality for managing and displaying the itinerary,
+ * including calculating the total price of all reservations.
  */
 class Itinerary {
 private:
-    std::vector<Reservation*> reservations; // List of reservations in the itinerary
+    std::vector<Reservation*> reservations;
 
 public:
-    // Add a reservation to the itinerary
-    void add_reservation (Reservation* reservation) {
+    void add_reservation(Reservation* reservation) {
         reservations.push_back(reservation);
     }
 
-    // Calculate the total price of all reservations in the itinerary
-    double get_total_price () const {
+    double get_total_price() const {
         double total_price = 0.0;
-
         for(int i=0; i<(int)reservations.size(); i++){
             total_price += reservations[i]->getTotalPrice();
         }
-
         return total_price;
     }
 
-    // Display information about all reservations in the itinerary
-    void showItineraryInfo () const {
+    void showItineraryInfo() const {
         for(int i=0; i<(int)reservations.size(); i++){
             reservations[i]->ShowReservationInfo();
-            std::cerr   <<  "\n";
+            std::cerr << "\n";
         }
-
-        std::cerr   <<  "-------------------------------------------------------------\n";
-        std::cerr   <<  "| Total Itinerary Price: "  <<  get_total_price() <<    "|\n";
-        std::cerr   <<  "-------------------------------------------------------------\n";
+        std::cerr << "-------------------------------------------------------------\n";
+        std::cerr << "| Total Itinerary Price: " << get_total_price() << "|\n";
+        std::cerr << "-------------------------------------------------------------\n";
     }
 };
+
+
+
+
+
+
 
 /**
  * Interface defining authentication-related operations.
@@ -669,10 +701,16 @@ public:
  */
 class IAuthentication {
 public:
-    IAuthentication () = default;
-    virtual bool checkUsername (const std::string& username, const std::set<std::string>& usernames) = 0;
-    virtual ~IAuthentication () = default;
+    IAuthentication() = default;
+    virtual bool checkUsername(const std::string& username, const std::set<std::string>& usernames) = 0;
+    virtual ~IAuthentication() = default;
 };
+
+
+
+
+
+
 
 /**
  * Handles user registration (sign-up) process.
@@ -681,7 +719,7 @@ public:
  */
 class SignUpService : public IAuthentication {
 public:
-    SignUpService () = default;
+    SignUpService() = default;
 
     /**
      * Checks whether a given username meets the required format and is not already in use.
@@ -690,34 +728,28 @@ public:
      * @param usernames A set of existing usernames to check for duplicates.
      * @return True if the username is valid and available, otherwise false.
      */
-    virtual bool checkUsername (const std::string& username, const std::set<std::string>& usernames) override {
-        // First check if this username is already in use by another user.
+    virtual bool checkUsername(const std::string& username, const std::set<std::string>& usernames) override {
         if(usernames.count(username))
             return false;
 
-        // Second check if the username format is correct (name should start with a character and contain only characters, digits, and underscores).
         if(!isalpha(username[0]))
             return false;
 
         for(int i=0; i<(int)username.length(); i++){
-            if( !(isdigit(username[i]) || (username[i] == '_') || (tolower(username[i]) >= 'a' && tolower(username[i]) <= 'z')) )
+            if(!(isdigit(username[i]) || (username[i] == '_') || (tolower(username[i]) >= 'a' && tolower(username[i]) <= 'z')))
                 return false;
         }
 
-        // Accepted
         return true;
     }
 
     /**
      * Validates whether the given password meets the required security format.
-     * This function ensures that the password follows predefined security rules,
-     * such as minimum length, presence of special characters, or other criteria.
      *
      * @param password The password to validate.
      * @return True if the password meets the required format, otherwise false.
      */
-    virtual bool validatePasswordFormat (const std::string& password) {
-        // The password should contain characters, special characters, and digits, with a maximum length of 10 and a minimum of 5.
+    virtual bool validatePasswordFormat(const std::string& password) {
         bool hasCharacter{false}, hasSpecialcharacter{false}, hasDigit{false};
 
         if((int)password.length() < 5 || (int)password.length() > 10)
@@ -726,10 +758,8 @@ public:
         for(int i=0; i<(int)password.length(); i++){
             if(isdigit(password[i]))
                 hasDigit = true;
-
             else if(isalpha(password[i]))
                 hasCharacter = true;
-
             else
                 hasSpecialcharacter = true;
         }
@@ -737,8 +767,12 @@ public:
         return (hasCharacter && hasSpecialcharacter && hasDigit);
     }
 
-    virtual ~SignUpService () = default;
+    virtual ~SignUpService() = default;
 };
+
+
+
+
 
 /**
  * Handles user authentication (sign-in) process.
@@ -747,67 +781,69 @@ public:
  */
 class SignInService : public IAuthentication {
 public:
-    SignInService () = default;
+    SignInService() = default;
 
     /**
-     * Checks whether a given username already exists.
+     * Checks whether a given username is already exist.
      *
      * @param username The username to check.
      * @param usernames A set of existing usernames to check for existence.
      * @return True if the username is valid, otherwise false.
      */
-     virtual bool checkUsername(const std::string& username, const std::set<std::string>& usernames) override {
+    virtual bool checkUsername(const std::string& username, const std::set<std::string>& usernames) override {
         return usernames.count(username);
-     }
+    }
 
-     // Verify if the provided password matches the user's password
-     virtual bool verifyUserPassword (const std::string& username, const std::string& userpassword, const std::unordered_map<std::string, User*>& userDirectory) {
-        return userpassword == userDirectory.at(username)->getPassword(); // Use at() to avoid modifying the map
-     }
+    /**
+     * Verifies whether the given password matches the user's password.
+     *
+     * @param username The username to verify.
+     * @param userpassword The password to verify.
+     * @param userDirectory A map of users to check against.
+     * @return True if the password matches, otherwise false.
+     */
+    virtual bool verifyUserPassword(const std::string& username, const std::string& userpassword, const std::unordered_map<std::string, User*>& userDirectory) {
+        return userpassword == userDirectory.at(username)->getPassword();
+    }
 
-    virtual ~SignInService () = default;
+    virtual ~SignInService() = default;
 };
+
+
+
+
 
 /**
  * Manages reading from and writing to the database file.
  * This class provides functionality to store and retrieve user data
  * in a persistent file-based database. It ensures efficient file
  * operations and data integrity.
- *
- * Responsibilities:
- * - Load user data from the database file.
- * - Save user data to the database file.
- * - Ensure data consistency between memory and storage.
- * - Handle file read/write errors gracefully.
  */
 class DatabaseManager {
 private:
-    std::string users_file_path; // Path to the users database file
-    std::string reservables_file_path; // Path to the reservables database file
-    std::string reservations_file_path; // Path to the reservations database file
+    std::string users_file_path;
+    std::string reservables_file_path;
+    std::string reservations_file_path;
 
-    // Private constructor to enforce singleton pattern
     DatabaseManager(const std::string& users_file_path, const std::string& reservables_file_path, const std::string& reservations_file_path) :
         users_file_path(users_file_path), reservables_file_path(reservables_file_path), reservations_file_path(reservations_file_path) {
     }
 
-    static DatabaseManager* databaseManagerInstance; // Singleton instance
+    static DatabaseManager* databaseManagerInstance;
 
 public:
-    // Get the singleton instance of DatabaseManager
-    static DatabaseManager* getInstance (const std::string& users_file_path, const std::string& reservables_file_path, const std::string& reservations_file_path) {
+    static DatabaseManager* getInstance(const std::string& users_file_path, const std::string& reservables_file_path, const std::string& reservations_file_path) {
         if(databaseManagerInstance == nullptr)
-            databaseManagerInstance = new DatabaseManager (users_file_path, reservables_file_path, reservations_file_path);
+            databaseManagerInstance = new DatabaseManager(users_file_path, reservables_file_path, reservations_file_path);
 
         return databaseManagerInstance;
     }
 
-    // Load users from the database file
-    void load_users (std::set<std::string>& usernames, std::unordered_map<std::string, User*>& userDirectory) {
+    void load_users(std::set<std::string>& usernames, std::unordered_map<std::string, User*>& userDirectory) {
         std::ifstream file_handler(users_file_path);
 
         if(file_handler.fail()){
-            std::cout   <<  "Sorry, something went wrong in the users file\n";
+            std::cout << "sorry,something went wrong in the users file\n";
             exit(0);
         }
 
@@ -834,8 +870,7 @@ public:
         }
     }
 
-    // Update the users database file with the current user data
-    void update_users (std::unordered_map<std::string, User*>& userDirectory) {
+    void update_users(std::unordered_map<std::string, User*>& userDirectory) {
         auto file_status = std::ios::in | std::ios::out | std::ios::trunc;
         std::ofstream file_handler(users_file_path, file_status);
 
@@ -851,12 +886,11 @@ public:
         file_handler.close();
     }
 
-    // Load reservables from the database file
-    void load_reservables (std::set<std::string>& reservableNames, std::unordered_map<std::string, Reservable*>& reservablesDirectory, std::vector<Reservable*>& reservables) {
+    void load_reservables(std::set<std::string>& reservableNames, std::unordered_map<std::string, Reservable*>& reservablesDirectory, std::vector<Reservable*>& reservables) {
         std::ifstream file_handler(reservables_file_path);
 
         if(file_handler.fail()){
-            std::cout   <<  "Sorry, something went wrong in the reservables file\n";
+            std::cout << "sorry,something went wrong in the reservables file\n";
             exit(0);
         }
 
@@ -972,10 +1006,10 @@ public:
             reservableNames.insert(name);
             reservables.push_back(reservablesDirectory[name]);
         }
+
     }
 
-    // Update the reservables database file with the current reservable data
-    void update_reservables (const std::unordered_map<std::string, Reservable*>& reservablesDirectory) {
+    void update_reservables(const std::unordered_map<std::string, Reservable*>& reservablesDirectory) {
         auto file_status = std::ios::in | std::ios::out | std::ios::trunc;
         std::ofstream file_handler(reservables_file_path, file_status);
 
@@ -1057,12 +1091,11 @@ public:
         file_handler.close();
     }
 
-    // Load reservations from the database file
-    void load_reservations (std::unordered_map<std::string, std::vector<Reservation*>>& reservationsDirectory, std::unordered_map<std::string, Reservable*>& reservablesDirectory, std::vector<Reservation*>& reservations) {
+    void load_reservations(std::unordered_map<std::string, std::vector<Reservation*>>& reservationsDirectory, std::unordered_map<std::string, Reservable*>& reservablesDirectory, std::vector<Reservation*>& reservations) {
         std::ifstream file_handler(reservations_file_path);
 
         if(file_handler.fail()){
-            std::cout   <<  "Sorry, something went wrong in the reservations file\n";
+            std::cout << "sorry,something went wrong in the reservations file\n";
             exit(0);
         }
 
@@ -1122,11 +1155,11 @@ public:
             reservation->setReservable(reservablesDirectory.at(reservableName));
             reservationsDirectory[userName].push_back(reservation);
             reservations.push_back(reservation);
+
         }
     }
 
-    // Update the reservations database file with the current reservation data
-    void update_reservations (const std::vector<Reservation*>& reservations) {
+    void update_reservations(const std::vector<Reservation*>& reservations) {
         auto file_status = std::ios::in | std::ios::out | std::ios::trunc;
         std::ofstream file_handler(reservations_file_path, file_status);
 
@@ -1147,107 +1180,119 @@ public:
         file_handler.close();
     }
 
-    // Free the singleton instance
-    static void freeInstance () {
+    static void freeInstance() {
         if(databaseManagerInstance == nullptr)
             return;
 
         delete databaseManagerInstance;
         databaseManagerInstance = nullptr;
     }
+
 };
 DatabaseManager* DatabaseManager :: databaseManagerInstance = nullptr;
 
-/**
- * Interface for UI classes.
- * This class defines a common interface for all UI classes.
- */
+
+
+
+
+
+// UI interface
 class UI {
 public:
     virtual void ShowMessage () = 0;
 };
 
+
+
+
+
 /**
- * Represents the home UI, which is the main interface for the user.
- * This class provides functionality for displaying the home screen and options.
+ * Represents the user interface for the home screen.
+ * This class provides functionality for displaying the home screen and
+ * handling user input.
  */
 class HomeUI : public UI {
 public:
-    void ShowMessage () override {
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
-        std::cerr   <<  "                                   |Choose|                               \n";
-        std::cerr   <<  "                                    ------                                \n";
-        std::cerr   <<  "| 1. Sign In                                                              \n";
-        std::cerr   <<  "| 2. Sign Up                                                              \n";
-        std::cerr   <<  "| 3. Admin                                                                \n";
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
+    void ShowMessage() override {
+        std::cerr << "--------------------------------------------------------------------------\n";
+        std::cerr << "                                   |Choose|                               \n";
+        std::cerr << "                                    ------                                \n";
+        std::cerr << "| 1. Sign In                                                              \n";
+        std::cerr << "| 2. Sign Up                                                              \n";
+        std::cerr << "| 3. Admin                                                                \n";
+        std::cerr << "--------------------------------------------------------------------------\n";
     }
 };
 
+
+
+
+
 /**
- * Represents the user UI, which provides functionality for user actions.
- * This class provides functionality for displaying user options and handling user input.
+ * Represents the user interface for the user screen.
+ * This class provides functionality for displaying the user screen and
+ * handling user input.
  */
 class UserUI : public UI {
 public:
-    void EnterUserNameMessage () {
+    void EnterUserNameMessage() {
         std::cout << "---------------------\n";
         std::cout << "|Enter The User Name|\n";
         std::cout << "---------------------\n";
     }
 
-    void EnterUserPasswordMessage () {
+    void EnterUserPasswordMessage() {
         std::cout << "--------------------------\n";
         std::cout << "|Enter The User Password: \n";
         std::cout << "--------------------------\n";
     }
 
-    void ShowErrorMessage () {
+    void ShowErrorMessage() {
         std::cout << "---------------------\n";
         std::cout << "| Sorry, try again! |\n";
         std::cout << "---------------------\n";
     }
 
-    void ShowSuccessMessage () {
+    void ShowSuccessMessage() {
         std::cout << "---------------------\n";
         std::cout << "|  Congratulations  |\n";
         std::cout << "---------------------\n";
     }
 
     virtual void ShowMessage() override {
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
-        std::cerr   <<  "| 1. Reserve                                                              \n";
-        std::cerr   <<  "| 2. Show My Reservations                                                 \n";
-        std::cerr   <<  "| 3. Cancel Reservation                                                   \n";
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
+        std::cerr << "--------------------------------------------------------------------------\n";
+        std::cerr << "| 1. Reserve                                                              \n";
+        std::cerr << "| 2. Show My Reservations                                                 \n";
+        std::cerr << "| 3. Cancel Reservation                                                   \n";
+        std::cerr << "--------------------------------------------------------------------------\n";
     }
 
-    void ShowCategoryList () {
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
-        std::cerr   <<  "|                             |Choose Category|                           \n";
-        std::cerr   <<  "                               ---------------                            \n";
-        std::cerr   <<  "| 1.Football                                                              \n";
-        std::cerr   <<  "| 2.Volleyball                                                            \n";
-        std::cerr   <<  "| 3.Tennis                                                                \n";
-        std::cerr   <<  "| 4.Swimming                                                              \n";
-        std::cerr   <<  "| 5.Ping Bong                                                             \n";
-        std::cerr   <<  "| 6.Billiards                                                             \n";
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
+    void ShowCategoryList() {
+        std::cerr << "--------------------------------------------------------------------------\n";
+        std::cerr << "|                             |Choose Category|                           \n";
+        std::cerr << "                               ---------------                            \n";
+        std::cerr << "| 1.Football                                                              \n";
+        std::cerr << "| 2.Volleyball                                                            \n";
+        std::cerr << "| 3.Tennis                                                                \n";
+        std::cerr << "| 4.Swimming                                                              \n";
+        std::cerr << "| 5.Ping Bong                                                             \n";
+        std::cerr << "| 6.Billiards                                                             \n";
+        std::cerr << "--------------------------------------------------------------------------\n";
     }
 
-    void ShowEnterCategoryMessage () {
-        std::cerr   <<  " ---------------- \n";
-        std::cerr   <<  "|Enter Category: |\n";
-        std::cerr   <<  " ---------------- \n";
+    void ShowEnterCategoryMessage() {
+        std::cerr << " ---------------- \n";
+        std::cerr << "|Enter Category: |\n";
+        std::cerr << " ---------------- \n";
     }
 
-    void ShowEnterPeriodMessage () {
-        std::cerr   <<  " -------------- \n";
-        std::cerr   <<  "|Enter Period: |\n";
-        std::cerr   <<  " -------------- \n";
+    void ShowEnterPeriodMessage() {
+        std::cerr << " -------------- \n";
+        std::cerr << "|Enter Period: |\n";
+        std::cerr << " -------------- \n";
     }
 
-    void ShowAvailableReservables (const std::unordered_map<std::string, Reservable*>& reservablesDirectory, const std::string& category, const std::pair<int, int>& period) {
+    void ShowAvailableReservables(const std::unordered_map<std::string, Reservable*>& reservablesDirectory, const std::string& category, const std::pair<int, int>& period) {
         for(auto& pair : reservablesDirectory) {
             if(reservablesDirectory.at(pair.first)->isReservableAvailable() && reservablesDirectory.at(pair.first)->getCategory() == category && reservablesDirectory.at(pair.first)->isPeriodAvailable(period.first, period.second))
                 reservablesDirectory.at(pair.first)->showReservableInfo();
@@ -1256,95 +1301,102 @@ public:
         }
     }
 
-    void ShowMyReservations (std::unordered_map<std::string, std::vector<Reservation*>>& reservationsDirectory, const std::string& userName) const {
-        if(reservationsDirectory.count(userName) == 0 || (int)reservationsDirectory[userName].size() == 0){
-            std::cerr   <<  "Sorry, you have no reservations yet\n";
+    void ShowMyReservations(std::unordered_map<std::string, std::vector<Reservation*>>& reservationsDirectory, const std::string& userName) const {
+        if(reservationsDirectory.count(userName) == 0 || (int)reservationsDirectory.at(userName).size() == 0){
+            std::cerr << "Sorry, you have no reservations yet\n";
             return;
         }
+
+
 
         for(auto& reservation : reservationsDirectory[userName])
             reservation->ShowReservationInfo();
     }
 };
 
+
+
+
+
 /**
- * Represents the admin UI, which provides functionality for admin actions.
- * This class provides functionality for displaying admin options and handling admin input.
+ * Represents the user interface for the admin screen.
+ * This class provides functionality for displaying the admin screen and
+ * handling admin input.
  */
 class AdminUI : public UI {
 public:
-    void EnterAdminNameMessage () {
+    void EnterAdminNameMessage() {
         std::cout << "----------------------\n";
         std::cout << "|Enter The Admin Name|\n";
         std::cout << "----------------------\n";
     }
 
-    void EnterAdminPasswordMessage () {
+    void EnterAdminPasswordMessage() {
         std::cout << "---------------------------\n";
         std::cout << "|Enter The Admin Password: \n";
         std::cout << "---------------------------\n";
     }
 
-    void ShowErrorMessage () {
+    void ShowErrorMessage() {
         std::cout << "---------------------\n";
         std::cout << "| Sorry, try again! |\n";
         std::cout << "---------------------\n";
     }
 
-    void ShowSuccessMessage () {
+    void ShowSuccessMessage() {
         std::cout << "---------------------\n";
         std::cout << "|  Congratulations  |\n";
         std::cout << "---------------------\n";
     }
 
     virtual void ShowMessage() override {
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
-        std::cerr   <<  "| 1. Add Reservable                                                       \n";
-        std::cerr   <<  "| 2. Update Reservable Status                                             \n";
-        std::cerr   <<  "| 3. Reservables List                                                     \n";
-        std::cerr   <<  "| 4. Reservations List                                                    \n";
-        std::cerr   <<  "| 5. Clear Reservations                                                   \n";
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
+        std::cerr << "--------------------------------------------------------------------------\n";
+        std::cerr << "| 1. Add Reservable                                                       \n";
+        std::cerr << "| 2. Update Reservable Status                                             \n";
+        std::cerr << "| 3. Reservables List                                                     \n";
+        std::cerr << "| 4. Reservations List                                                    \n";
+        std::cerr << "| 5. Clear Reservations                                                   \n";
+        std::cerr << "--------------------------------------------------------------------------\n";
     }
 
-    void ShowCategoryList () {
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
-        std::cerr   <<  "|                             |Choose Category|                           \n";
-        std::cerr   <<  "                               ---------------                            \n";
-        std::cerr   <<  "| 1.Football                                                              \n";
-        std::cerr   <<  "| 2.Volleyball                                                            \n";
-        std::cerr   <<  "| 3.Tennis                                                                \n";
-        std::cerr   <<  "| 4.Swimming                                                              \n";
-        std::cerr   <<  "| 5.Ping Bong                                                             \n";
-        std::cerr   <<  "| 6.Billiards                                                             \n";
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
+    void ShowCategoryList() {
+        std::cerr << "--------------------------------------------------------------------------\n";
+        std::cerr << "|                             |Choose Category|                           \n";
+        std::cerr << "                               ---------------                            \n";
+        std::cerr << "| 1.Football                                                              \n";
+        std::cerr << "| 2.Volleyball                                                            \n";
+        std::cerr << "| 3.Tennis                                                                \n";
+        std::cerr << "| 4.Swimming                                                              \n";
+        std::cerr << "| 5.Ping Bong                                                             \n";
+        std::cerr << "| 6.Billiards                                                             \n";
+        std::cerr << "--------------------------------------------------------------------------\n";
     }
 
-    void ShowEnterReservableName () {
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
-        std::cerr   <<  "| Enter Reservable Name:                                                  \n";
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
+    void ShowEnterReservableName() {
+        std::cerr << "--------------------------------------------------------------------------\n";
+        std::cerr << "| Enter Reservable Name:                                                  \n";
+        std::cerr << "--------------------------------------------------------------------------\n";
     }
 
-    void ShowAddReservableMessage () {
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
-        std::cerr   <<  "| Enter Name, Is Available?(true or false)                                \n";
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
+    void ShowAddReservableMessage() {
+        std::cerr << "--------------------------------------------------------------------------\n";
+        std::cerr << "| Enter Name, Is Available?(true or false)                                \n";
+        std::cerr << "--------------------------------------------------------------------------\n";
     }
 
-    void ShowUpdateReservableStatusMessage () {
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
-        std::cerr   <<  "| Enter New Reservable Status Is Available?(true or false)                \n";
-        std::cerr   <<  "--------------------------------------------------------------------------\n";
+    void ShowUpdateReservableStatusMessage() {
+        std::cerr << "--------------------------------------------------------------------------\n";
+        std::cerr << "| Enter New Reservable Status Is Available?(true or false)                \n";
+        std::cerr << "--------------------------------------------------------------------------\n";
     }
 
-    void ShowReservablesList (const std::unordered_map<std::string, Reservable*>& reservablesDirectory) {
+    void ShowReservablesList(const std::unordered_map<std::string, Reservable*>& reservablesDirectory) {
         for(auto& pair : reservablesDirectory){
             pair.second->showReservableInfo();
         }
     }
 
-    void ShowReservationsList (const std::vector<Reservation*>& reservations) {
+    void ShowReservationsList(const std::vector<Reservation*>& reservations) {
         for(auto& reservation : reservations){
             reservation->ShowReservationInfo();
         }
@@ -1352,18 +1404,20 @@ public:
     }
 };
 
-// Map to associate category numbers with category names
+
+
+
+
+
+
+
+// useful for mapping each game category
 std::unordered_map<int, std::string> categories_map = {{1,"Football"}, {2,"Volleyball"}, {3,"Tennis"}, {4,"Swimming"}, {5,"Ping"}, {6,"Billiards"}};
 
 /**
  * Manages the core system operations, including user sign-up, sign-in,
  * and database interactions. This class serves as the central controller
  * for user authentication and data management.
- *
- * Responsibilities:
- * - Handles user registration and login.
- * - Interfaces with the database manager to load and update user data.
- * - Maintains in-memory user records for quick lookups.
  */
 class SystemManager {
 private:
@@ -1390,8 +1444,6 @@ public:
      * Initializes the SystemManager by loading user data from the database.
      *
      * @param users_file_path Path to the user database file.
-     * @param reservables_file_path Path to the reservables database file.
-     * @param reservations_file_path Path to the reservations database file.
      */
     SystemManager(const std::string& users_file_path, const std::string& reservables_file_path, const std::string& reservations_file_path) {
         databaseManagerInstance = DatabaseManager::getInstance(users_file_path, reservables_file_path, reservations_file_path);
@@ -1401,8 +1453,21 @@ public:
         databaseManagerInstance->load_reservations(reservationsDirectory, reservablesDirectory, reservations);
     }
 
-    // Handle reservation process for a user
-    void do_reserve (const std::string& userName, const int& categoryChoise, const std::pair<int, int>& chosenPeriod) {
+    ~SystemManager () {
+        databaseManagerInstance->freeInstance();
+
+        for(auto& pair : userDirectory){
+            delete pair.second;
+        }
+        for(auto& i : reservations) {
+            delete i;
+        }
+        for(auto& i: reservables){
+            delete i;
+        }
+    }
+
+    void do_reserve(const std::string& userName, const int& categoryChoise, const std::pair<int, int>& chosenPeriod) {
         Reservable* reservable = nullptr;
         Reservation* reservation = nullptr;
 
@@ -1414,7 +1479,7 @@ public:
         }
 
         if(reservable == nullptr){
-            std::cerr   <<  "Sorry, no reservables available at this period\n";
+            std::cerr << "Sorry, no reservables available at this period\n";
             return;
         }
 
@@ -1459,8 +1524,7 @@ public:
         reservation->ShowReservationInfo();
     }
 
-    // Handle cancellation of a reservation
-    void cancel_reservation (const std::string& userName, const std::string& reservableName, const std::pair<int, int>& reservedPeriod) {
+    void cancel_reservation(const std::string& userName, const std::string& reservableName, const std::pair<int, int>& reservedPeriod) {
         for (auto& re : reservables) {
             if(re->getName() == reservableName){
                 re->freePeriod(reservedPeriod.first, reservedPeriod.second);
@@ -1492,14 +1556,14 @@ public:
             }
         }
 
+        std::cerr    <<  "\nReservations canceled\n";
         return;
     }
 
-    // Handle user actions (reserve, show reservations, cancel reservation)
-    void run_user_actions (const std::string& userName) {
+    void run_user_actions(const std::string& userName) {
         userUI.ShowMessage();
 
-        std::cerr   <<  "Press 0 if want to quit\n";
+        std::cerr << "Press 0 if want to quit\n";
 
         int choice;
         std::cin>>choice;
@@ -1517,7 +1581,7 @@ public:
             std::cin>>categoryChoise;
 
             if (categoryChoise < 1 || categoryChoise > 6) {
-                std::cerr   <<  "Sorry, invalid choice\n\n";
+                std::cerr << "Sorry, invalid choice\n\n";
                 return;
             }
 
@@ -1533,19 +1597,18 @@ public:
             std::string reservableName;
             std::pair<int, int> reservedPeriod;
 
-            std::cerr   <<  "Enter reservable name, reservaed period as(from, to): ";
-            std::cin    >>reservableName    >>  reservedPeriod.first    >>  reservedPeriod.second;
+            std::cerr << "Enter reservable name, reservaed period as(from, to): ";
+            std::cin >> reservableName >> reservedPeriod.first >> reservedPeriod.second;
 
             cancel_reservation(userName, reservableName, reservedPeriod);
 
         } else {
-            std::cerr   <<  "Sorry, invalid choice\n\n";
+            std::cerr << "Sorry, invalid choice\n\n";
         }
 
         return;
     }
 
-    // Handle adding a new reservable by the admin
     void do_add_reservable(const int& chosenCategory){
         Reservable* new_reservable = nullptr;
 
@@ -1600,7 +1663,6 @@ public:
         reservables.push_back(new_reservable);
     }
 
-    // Handle clearing all reservations
     void do_clear_reservations(){
         for(auto& reservable : reservables){
             reservable->freeWholePeriods();
@@ -1618,11 +1680,10 @@ public:
         reservations.clear();
     }
 
-    // Handle admin actions (add reservable, update status, show lists, clear reservations)
-    void run_admin_actions () {
+    void run_admin_actions() {
         adminUI.ShowMessage();
 
-        std::cerr   <<  "Press 0 if want to quit\n";
+        std::cerr << "Press 0 if want to quit\n";
 
         int choice;
         std::cin>>choice;
@@ -1637,7 +1698,7 @@ public:
             std::cin>>categoryChoise;
 
             if (categoryChoise < 1 || categoryChoise > 6) {
-                std::cerr   <<  "Sorry, invalid choice\n\n";
+                std::cerr << "Sorry, invalid choice\n\n";
                 return;
             }
             do_add_reservable(categoryChoise);
@@ -1656,7 +1717,7 @@ public:
 
             for(auto& reservation : reservations){
                 if(reservation->getReservable()->getName() == reservableName){
-                    std::cerr    <<  "Sorry, but this reservable is already reserved by someone\n";
+                    std::cerr << "Sorry, but this reservable is already reserved by someone\n";
                     return;
                 }
             }
@@ -1678,14 +1739,13 @@ public:
             do_clear_reservations();
 
         }else {
-            std::cerr   <<  "Sorry, invalid choice\n\n";
+            std::cerr << "Sorry, invalid choice\n\n";
         }
 
         return;
     }
 
-    // Handle user sign-in process
-    void user_signin () {
+    void user_signin() {
         std::string userName;
         std::string Password;
 
@@ -1709,8 +1769,7 @@ public:
         run_user_actions(userName);
     }
 
-    // Handle user sign-up process
-    void user_signup () {
+    void user_signup() {
         std::string userName;
         std::string Password;
 
@@ -1737,8 +1796,7 @@ public:
         run_user_actions(userName);
     }
 
-    // Handle admin sign-in process
-    void admin_signin () {
+    void admin_signin() {
         std::string adminName;
         std::string adminPassword;
 
@@ -1767,17 +1825,15 @@ public:
         run_admin_actions();
     }
 
-    // Update the database with current data
-    void update_data_base () {
+    void update_data_base() {
         databaseManagerInstance->update_reservables(reservablesDirectory);
         databaseManagerInstance->update_users(userDirectory);
         databaseManagerInstance->update_reservations(reservations);
     }
 
-    // Run the main system loop
-    void run_system () {
+    void run_system() {
         while(true){
-            std::cerr   <<  "Press 0 if want to quit\n";
+            std::cerr << "Press 0 if want to quit\n";
 
             homeUI.ShowMessage();
 
@@ -1796,12 +1852,13 @@ public:
             }
         }
 
-        update_data_base ();
-        databaseManagerInstance->freeInstance();
+        update_data_base();
     }
 };
 
-// Main function to start the system
+
+
+
 int main() {
     SystemManager sys("data_base\\users.txt", "data_base\\reservables.txt", "data_base\\reservations.txt");
     sys.run_system();
